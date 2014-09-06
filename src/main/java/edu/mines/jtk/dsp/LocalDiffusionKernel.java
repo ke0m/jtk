@@ -9,6 +9,9 @@ package edu.mines.jtk.dsp;
 import edu.mines.jtk.util.*;
 import static edu.mines.jtk.util.ArrayMath.*;
 
+import static org.jocl.CL.*;
+import org.jocl.*;
+
 /**
  * A local diffusion kernel for use in anisotropic diffusion filtering.
  * <p>
@@ -66,6 +69,13 @@ public class LocalDiffusionKernel {
      * This stencil is the default. 
      */
     D22,
+    /** 
+     * A 2x2 stencil. 
+     * The 2D version has 4 non-zero coefficients.
+     * The 3D version has 8 non-zero coefficients.
+     * This stencil is the default. 
+     */
+    D22CL,
     /** 
      * A 2x4 stencil. 
      * The 2D version has 8 non-zero coefficients.
@@ -209,6 +219,23 @@ public class LocalDiffusionKernel {
       }
     }
   }
+  
+  public void applyGPU(
+	int n1, int n2)
+  {
+	  for(int ipass=0; ipass<_npass; ++ipass) {
+		  if(ipass>0)
+			  System.out.println("Test");
+			  //x = copy(y);
+		  if(_stencil==Stencil.D22CL) {
+			  apply22CL(n1,n2);
+		  }
+		  
+	  }
+ 
+  }
+  
+  
 
   /**
    * Applies this filter for a constant isotropic identity tensor.
@@ -474,7 +501,27 @@ public class LocalDiffusionKernel {
       }
     }
   }
-
+  
+  private void apply22CL(int n1, int n2)
+  {
+	  
+	  long[] local_group_size = new long[]{32, 32}; //I also need to change this so that it works for all GPUS
+	  long[] mapped_n1 = new long[]{n2/2};
+	  long[] mapped_n2 = new long[]{n1/2};
+	  long[] global_group_size_block = new long[]{(long)Math.ceil(mapped_n1[0]/local_group_size[0] + 1)*local_group_size[0], (long)Math.ceil(mapped_n2[0]/local_group_size[0] + 1) * local_group_size[1]};
+	  
+		for(int offsetx = 0; offsetx < 2; ++offsetx)
+		{
+			for(int offsety = 0; offsety < 2; ++offsety)
+			{
+				CLUtil.setKernelArg(CLUtil.kernels[1], offsetx, 8);
+				CLUtil.setKernelArg(CLUtil.kernels[1], offsety, 9);
+				CLUtil.executeKernel(CLUtil.kernels[1], 2, global_group_size_block, local_group_size);
+			}
+		}	
+  }
+  
+  
   private void apply22X(
     Tensors2 d, float c, float[][] s, float[][] x, float[][] y) 
   {
