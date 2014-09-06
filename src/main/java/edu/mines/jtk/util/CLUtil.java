@@ -3,11 +3,12 @@ package edu.mines.jtk.util;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
+import java.nio.*;
 
 import org.jocl.*;
-
 import static org.jocl.CL.*;
 import edu.mines.jtk.dsp.*;
+
 
 //TODO: 1. Add the capablitity to create multiple kernels from one string (Has this been done? I think so)
 //      2. Make this more generic. Multithreading for both CPU and GPU
@@ -27,6 +28,7 @@ public class CLUtil {
 	public static cl_mem buff2;
 	public static int err;
 	public static int[] errM = new int[1];
+	public static long maxWorkGroupSize;
 
 	public static cl_program program;
 	public static cl_kernel[] kernels;
@@ -85,7 +87,9 @@ public class CLUtil {
 			}
 			
 		}
-
+		
+		//Getting the maximum work group size for the GPU
+		maxWorkGroupSize = getSize(devices[0], CL_DEVICE_MAX_WORK_GROUP_SIZE);
 	
 		queue = CL.clCreateCommandQueue(context, devices[0], 0, errM);
 		if(errM[0] != CL.CL_SUCCESS){
@@ -327,6 +331,52 @@ public class CLUtil {
 
 			return buildInfo;
 		}
+	  
+	    /**
+	     * Returns the value of the device info parameter with the given name
+	     *
+	     * @param device The device
+	     * @param paramName The parameter name
+	     * @return The value
+	     */
+	    private static long getSize(cl_device_id device, int paramName)
+	    {
+	        return getSizes(device, paramName, 1)[0];
+	    }
+	  
+	    /**
+	     * Returns the values of the device info parameter with the given name
+	     *
+	     * @param device The device
+	     * @param paramName The parameter name
+	     * @param numValues The number of values
+	     * @return The value
+	     */
+	    private static long[] getSizes(cl_device_id device, int paramName, int numValues)
+	    {
+	        // The size of the returned data has to depend on 
+	        // the size of a size_t, which is handled here
+	        ByteBuffer buffer = ByteBuffer.allocate(
+	            numValues * Sizeof.size_t).order(ByteOrder.nativeOrder());
+	        clGetDeviceInfo(device, paramName, Sizeof.size_t * numValues, 
+	            Pointer.to(buffer), null);
+	        long values[] = new long[numValues];
+	        if (Sizeof.size_t == 4)
+	        {
+	            for (int i=0; i<numValues; i++)
+	            {
+	                values[i] = buffer.getInt(i * Sizeof.size_t);
+	            }
+	        }
+	        else
+	        {
+	            for (int i=0; i<numValues; i++)
+	            {
+	                values[i] = buffer.getLong(i * Sizeof.size_t);
+	            }
+	        }
+	        return values;
+	    }
 	  
 	  private CLUtil() {
 	  }

@@ -505,7 +505,8 @@ public class LocalDiffusionKernel {
   private void apply22CL(int n1, int n2)
   {
 	  
-	  long[] local_group_size = new long[]{32, 32}; //I also need to change this so that it works for all GPUS
+	//  long[] local_group_size = new long[]{32, 32}; //I also need to change this so that it works for all GPUS
+	  long[] local_group_size = new long[]{16, 16}; //I also need to change this so that it works for all GPUS
 	  long[] mapped_n1 = new long[]{n2/2};
 	  long[] mapped_n2 = new long[]{n1/2};
 	  long[] global_group_size_block = new long[]{(long)Math.ceil(mapped_n1[0]/local_group_size[0] + 1)*local_group_size[0], (long)Math.ceil(mapped_n2[0]/local_group_size[0] + 1) * local_group_size[1]};

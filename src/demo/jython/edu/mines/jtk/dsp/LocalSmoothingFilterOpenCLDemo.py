@@ -59,7 +59,7 @@ class Demo(JFrame, Runnable):
         qButton.setToolTipText("Quit Button")
         self.panel.add(qButton)
 		# I should set this to an environment variable
-        newImage = ImageIO.read(io.File("C:\Users\Dave\Desktop\workspace_tmp\jtk\data\input.png"))
+        newImage = ImageIO.read(io.File("/Users/joe/dev/jtk/data/input.png"))
         resizedImage =  newImage.getScaledInstance(600, 600,10)
         newIcon = ImageIcon(resizedImage)
         label1 = JLabel("Input Image",newIcon, JLabel.CENTER)

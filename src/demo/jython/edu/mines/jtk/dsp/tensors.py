@@ -173,7 +173,7 @@ def plotTp(g,s1,s2,d=None,dscale=1,cmin=0,cmax=0,png=None):
 def readPnzImage():
     s1 = Sampling(501,0.0125,0.0)
     s2 = Sampling(501,0.0125,0.0)
-    g = readImage("C:\Users\Dave\Desktop\workspace_tmp\jtk\data\ggs256",s1,s2)
+    g = readImage("/Users/joe/dev/jtk/data/ggs256",s1,s2)
     return g,s1,s2
 
 def readTpImage():
