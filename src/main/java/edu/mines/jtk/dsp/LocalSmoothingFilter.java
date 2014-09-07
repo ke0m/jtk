@@ -69,6 +69,7 @@ public class LocalSmoothingFilter {
 	
 	//This main method is simply for testing my OpenCL methods
 	//on my Mac
+/*
 	public static void main(String[] args){
 		
 		Random rand = new Random();
@@ -186,6 +187,7 @@ public class LocalSmoothingFilter {
 
 		
 	}
+*/
 
   /**
    * Constructs a local smoothing filter with default parameters.
@@ -411,6 +413,7 @@ public class LocalSmoothingFilter {
 			  cl_mem d_r = CLUtil.createGPUBuffer(size, "rw");
 			  cl_mem d_q = CLUtil.createGPUBuffer(size, "rw");
 			  cl_mem d_delta = CLUtil.createGPUBuffer(num_groups, "rw");
+//			  cl_mem d_delta = CLUtil.createGPUBuffer(size, "rw");
 			  CLUtil.copyToBuffer(d11, d_d11, size);
 			  CLUtil.copyToBuffer(d12, d_d12, size);
 			  CLUtil.copyToBuffer(d22, d_d22, size);
@@ -953,7 +956,8 @@ public class LocalSmoothingFilter {
     float rnormSmall = bnorm*_small;
     int iter;
     log.fine("solve: bnorm="+bnorm+" rnorm="+rnorm);
-    for (iter=0; iter<_niter && rnorm>rnormSmall; ++iter) {
+    //for (iter=0; iter<_niter && rnorm>rnormSmall; ++iter) {
+    for (iter=0; iter<_niter; ++iter) {
       log.finer("  iter="+iter+" rnorm="+rnorm+" ratio="+rnorm/rnormBegin);
       a.apply(d,q); // q = Ad
       float dq = sdot(d,q); // d'q = d'Ad
@@ -981,7 +985,7 @@ public class LocalSmoothingFilter {
 	    float[] p_delta = new float[(int)(size/CLUtil.maxWorkGroupSize/4)]; //This also needs to be changed for any GPU
 	    long[] local_work_size_vec = {CLUtil.maxWorkGroupSize};
 	    long[] global_work_size_oned = {size};
-	    long[] global_work_size_vec = {((long)Math.ceil(size/local_work_size_vec[0]/4)+1)*local_work_size_vec[0]};
+	    long[] global_work_size_vec = {((long)Math.ceil(size/local_work_size_vec[0]/4)+1)*local_work_size_vec[0]}; //why divide by four?
 	    CLUtil.setKernelArg(CLUtil.kernels[0], n1, 0);
 	    CLUtil.setKernelArg(CLUtil.kernels[0], n2, 1);
 	    CLUtil.setKernelArg(CLUtil.kernels[0], d_x, 2);
@@ -1003,7 +1007,7 @@ public class LocalSmoothingFilter {
 	    CLUtil.setKernelArg(CLUtil.kernels[2], d_q, 3);
 	    CLUtil.setKernelArg(CLUtil.kernels[2], d_r, 4);
 	    CLUtil.executeKernel(CLUtil.kernels[2], 1, global_work_size_oned);
-	    CLUtil.readFromBuffer(d_r, r, size);
+//	    CLUtil.readFromBuffer(d_r, r, size);
 //	    dump(r);
 //	    saxpy1(n1,n2,-1.0f,q,r); // r = b-Ax  //Flops
 	    CLUtil.setKernelArg(CLUtil.kernels[0], n1, 0);
@@ -1011,7 +1015,7 @@ public class LocalSmoothingFilter {
 	    CLUtil.setKernelArg(CLUtil.kernels[0], d_r, 2);
 	    CLUtil.setKernelArg(CLUtil.kernels[0], d_d, 3);
 	    CLUtil.executeKernel(CLUtil.kernels[0], 1, global_work_size_oned);
-	    CLUtil.readFromBuffer(d_d, d, size);
+//	    CLUtil.readFromBuffer(d_d, d, size);
 //	    dump(d);
 //	    scopy(r,d); // d = r
 	    CLUtil.setKernelArg(CLUtil.kernels[3], n1, 0);
@@ -1039,6 +1043,7 @@ public class LocalSmoothingFilter {
 //	    CLUtil.readFromBuffer(d_delta, p_delta, size/1024/4);
 	    CLUtil.readFromBuffer(d_delta, p_delta, (int)(size/CLUtil.maxWorkGroupSize/4));
 	    float bnorm = sqrt(sum(p_delta));
+//	    System.out.println(bnorm);
 //	    float bnorm = sqrt(sdot1(n1,n2,b,b)); 
 	    //float rnorm = sqrt(delta); 
 	    //float rnormBegin = rnorm;
@@ -1052,8 +1057,8 @@ public class LocalSmoothingFilter {
 	      CLUtil.setKernelArg(CLUtil.kernels[1], n1, 6);
 	      CLUtil.setKernelArg(CLUtil.kernels[1], n2, 7);
 	      a.applyGPU(n1,n2,d_d,d_q); // q = Ad 
-	      //CLUtil.readFromBuffer(d_q, q, size);
-	      //dump(q);
+//	      CLUtil.readFromBuffer(d_q, q, size);
+//	      dump(q);
 	      CLUtil.setKernelArg(CLUtil.kernels[3], n1, 0);
 	      CLUtil.setKernelArg(CLUtil.kernels[3], n2, 1);
 	      CLUtil.setKernelArg(CLUtil.kernels[3], d_d, 2);
