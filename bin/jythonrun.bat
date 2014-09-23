@@ -14,6 +14,7 @@ set CLASSPATH=^
 %MINES_JTK_HOME%\libs\jogl-all.jar;^
 %MINES_JTK_HOME%\libs\junit.jar;^
 %MINES_JTK_HOME%\libs\jythonlib.jar;^
+%MINES_JTK_HOME%\libs\JOCL-0.1.9.jar:\
 .
 
 rem Run a server VM with assertions enabled and a 1GB max Java heap.
