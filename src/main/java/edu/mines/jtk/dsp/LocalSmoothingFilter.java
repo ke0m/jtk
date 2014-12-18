@@ -423,8 +423,8 @@ public class LocalSmoothingFilter {
 			  CLUtil.setKernelArg(CLUtil.kernels[1], d_d12, 2);
 			  CLUtil.setKernelArg(CLUtil.kernels[1], d_d22, 3);
 			  CLUtil.setKernelArg(CLUtil.kernels[1], c1, 5); //should I be worried about this c1 value??? Not sure.
-			  Operator2G a = new A2G(_ldk,d11,d12,d22,c,s1);
-			  solveG(a,n1,n2,d_x,d_y,d_d,d_q,d_r,d_delta);
+			  Operator2G a = new A2G(_ldk,d11,d12,d22,c,s1); //constructs the diffusion operator
+			  solveG(a,n1,n2,d_x,d_y,d_d,d_q,d_r,d_delta); //solves the system of equations via a CG solver
 			  CLUtil.readFromBuffer(d_y, y1, size_y);
 			  clReleaseMemObject(d_x);
 			  clReleaseMemObject(d_y);
@@ -728,6 +728,7 @@ public class LocalSmoothingFilter {
   }
   
   private static class A2G implements Operator2G {
+		//constructor for class A2G
 	  A2G(LocalDiffusionKernel ldk, float[] d11, float[] d12, float[] d22, float c, float[] s) {
 		 _ldk = ldk;
 		 _d11 = d11;
@@ -738,6 +739,7 @@ public class LocalSmoothingFilter {
 		  
 	  }
 	  
+		//A method in the class A2G
 	  public void applyGPU(int n1, int n2, cl_mem d_x, cl_mem d_y)
 	  {
 		  //wscopy(n1, n2, x,y);
