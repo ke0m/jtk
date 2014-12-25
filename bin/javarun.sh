@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Where is the Mines JTK? (Where is your build.xml?)
-export MINES_JTK_HOME=$HOME/git/jtk
+export MINES_JTK_HOME=$DEV/jtk
 
 # If Mac OS X, which version of Java should we use?
 export JAVA_VERSION=1.7.0
