@@ -39,15 +39,14 @@ class Demo(JFrame, Runnable):
         self.panel.setLayout(FlowLayout( ))
         self.panel.setToolTipText("GPU Demo")
 
+#TODO- change this so that it deletes itself when text is entered
         self.textfield1 = JTextField('Smoothing Parameter',15)        
         self.panel.add(self.textfield1)
       
-        
         joclButton = JButton("JOCL",actionPerformed=self.onJocl)
         joclButton.setBounds(100, 500, 100, 30)
         joclButton.setToolTipText("JOCL Button")
         self.panel.add(joclButton)
-        
         
         javaButton = JButton("Java",actionPerformed=self.onJava)
         javaButton.setBounds(100, 500, 100, 30)
@@ -58,8 +57,8 @@ class Demo(JFrame, Runnable):
         qButton.setBounds(200, 500, 80, 30)
         qButton.setToolTipText("Quit Button")
         self.panel.add(qButton)
-		# I should set this to an environment variable
-        newImage = ImageIO.read(io.File("/Users/joe/dev/jtk/data/input.png"))
+#TODO- Set this to an environment variable
+        newImage = ImageIO.read(io.File("/home/joe/dev/jtk/data/input.png"))
         resizedImage =  newImage.getScaledInstance(600, 600,10)
         newIcon = ImageIcon(resizedImage)
         label1 = JLabel("Input Image",newIcon, JLabel.CENTER)
@@ -85,8 +84,8 @@ class Demo(JFrame, Runnable):
         
         self.panel.add(self.clockLabel)
         
-        self.setTitle("GPU Demo")
-        self.setSize(1200, 600)
+        self.setTitle("Structure-oriented smoothing OpenCL Demo")
+        self.setSize(1200, 700)
         self.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE)
         self.setLocationRelativeTo(None)
         self.setVisible(True)

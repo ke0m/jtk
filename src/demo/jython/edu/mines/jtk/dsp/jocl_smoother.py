@@ -23,7 +23,7 @@ from tensors import *
 
 def jocl_smoother(alpha):
     
-    kernel = LocalDiffusionKernel(LocalDiffusionKernel.Stencil.D22CL)
+    kernel = LocalDiffusionKernel(LocalDiffusionKernel.Stencil.D22CL) ## This Stencil can vary
     smooth_gpu = LocalSmoothingFilter(0, int(5*sqrt(2*alpha)), kernel)
 
 	

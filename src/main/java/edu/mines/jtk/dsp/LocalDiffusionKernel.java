@@ -224,9 +224,7 @@ public class LocalDiffusionKernel {
 	int n1, int n2)
   {
 	  for(int ipass=0; ipass<_npass; ++ipass) {
-		  if(ipass>0)
-			  System.out.println("Test");
-			  //x = copy(y);
+			//TODO - Allow for multiple passes
 		  if(_stencil==Stencil.D22CL) {
 			  apply22CL(n1,n2);
 		  }
@@ -505,8 +503,9 @@ public class LocalDiffusionKernel {
   private void apply22CL(int n1, int n2)
   {
 	  
-	//  long[] local_group_size = new long[]{32, 32}; //I also need to change this so that it works for all GPUS
-	  long[] local_group_size = new long[]{16, 16}; //I also need to change this so that it works for all GPUS
+		//TODO - do not hard code the local_group_size
+	  long[] local_group_size = new long[]{32, 32}; 
+	  //long[] local_group_size = new long[]{16, 16}; 
 	  long[] mapped_n1 = new long[]{n2/2};
 	  long[] mapped_n2 = new long[]{n1/2};
 	  long[] global_group_size_block = new long[]{(long)Math.ceil(mapped_n1[0]/local_group_size[0] + 1)*local_group_size[0], (long)Math.ceil(mapped_n2[0]/local_group_size[0] + 1) * local_group_size[1]};
