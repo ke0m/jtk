@@ -220,6 +220,14 @@ public class LocalDiffusionKernel {
     }
   }
   
+  /**  
+   * Applies this filter for specified tensor coefficients and scale factors.
+   * @param d tensor coefficients.
+   * @param c constant scale factor for tensor coefficients.
+   * @param s array of scale factors for tensor coefficients.
+   * @param x input array.
+   * @param y output array.
+   */
   public void applyGPU(
     int n1, int n2)
   {
@@ -228,13 +236,9 @@ public class LocalDiffusionKernel {
       if(_stencil==Stencil.D22CL) {
         apply22CL(n1,n2);
       }
-
     }
-
   }
   
-  
-
   /**
    * Applies this filter for a constant isotropic identity tensor.
    * @param x input array.
@@ -502,23 +506,22 @@ public class LocalDiffusionKernel {
   
   private void apply22CL(int n1, int n2)
   {
-	  
-		//TODO - do not hard code the local_group_size
-	  //long[] local_group_size = new long[]{32, 32}; 
-	  long[] local_group_size = new long[]{16, 16}; 
-	  long[] mapped_n1 = new long[]{n2/2};
-	  long[] mapped_n2 = new long[]{n1/2};
-	  long[] global_group_size_block = new long[]{(long)Math.ceil(mapped_n1[0]/local_group_size[0] + 1)*local_group_size[0], (long)Math.ceil(mapped_n2[0]/local_group_size[0] + 1) * local_group_size[1]};
-	  
-		for(int offsetx = 0; offsetx < 2; ++offsetx)
-		{
-			for(int offsety = 0; offsety < 2; ++offsety)
-			{
-				CLUtil.setKernelArg(CLUtil.kernels[1], offsetx, 8);
-				CLUtil.setKernelArg(CLUtil.kernels[1], offsety, 9);
-				CLUtil.executeKernel(CLUtil.kernels[1], 2, global_group_size_block, local_group_size);
-			}
-		}	
+    //TODO - do not hard code the local_group_size
+    //long[] local_group_size = new long[]{32, 32}; 
+    long[] local_group_size = new long[]{16, 16}; 
+    long[] mapped_n1 = new long[]{n2/2};
+    long[] mapped_n2 = new long[]{n1/2};
+    long[] global_group_size_block = new long[]{(long)Math.ceil(mapped_n1[0]/local_group_size[0] + 1)*local_group_size[0], (long)Math.ceil(mapped_n2[0]/local_group_size[0] + 1) * local_group_size[1]};
+
+    for(int offsetx = 0; offsetx < 2; ++offsetx)
+    {
+      for(int offsety = 0; offsety < 2; ++offsety)
+      {
+        CLUtil.setKernelArg(CLUtil.kernels[1], offsetx, 8);
+        CLUtil.setKernelArg(CLUtil.kernels[1], offsety, 9);
+        CLUtil.executeKernel(CLUtil.kernels[1], 2, global_group_size_block, local_group_size);
+      }
+    }	
   }
   
   
