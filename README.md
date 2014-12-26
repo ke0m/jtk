@@ -5,14 +5,16 @@ under the guidance of Professor [Dave Hale](http://inside.mines.edu/~dhale)
 at the [Colorado School of Mines](http://mines.edu).
 
 This software builds upon the  [Mines Java Toolkit (JTK)](https://github.com/dhale/jtk/) which 
-will first need to be downloaded and built in order to run the actual Structure-Oriented Smoothing software 
+will first need to be downloaded and built in order to run the structure-oriented smoothing software 
 contained within this repository. Specifically, the final product of this software
 is a small extension within the `src/main/java/edu/mines/jtk/dsp/LocalSmoothingFilter.java` class of the Mines JTK that was first published in Professor 
 Hale's paper [Structure-oriented smoothing and semblance](http://inside.mines.edu/~dhale/papers/Hale09StructureOrientedSmoothingAndSemblance.pdf).
 My extension utilizes the [JOCL](http://www.jocl.org/) libraries (Java bindings for OpenCL) to multi-thread the 
 LocalDiffusionKernel and conjugate gradient solver on a GPU (Graphics Processing Unit). 
 
-In addition to the Mines JTK, drivers for your GPU must be downloaded to execute the OpenCL programs.
+To build the Mines JTK, you can clone this repository and follow the instructions within the `readme.txt` shown below.
+
+In addition to the Mines JTK, drivers for your GPU must be downloaded and installed to execute the OpenCL programs.
 For systems using AMD graphics cards, the OpenCL drivers can be downloaded from 
 [here](http://developer.amd.com/tools-and-sdks/opencl-zone/).
 For systems with NVIDIA graphics cards, first, the CUDA drivers will need to 
