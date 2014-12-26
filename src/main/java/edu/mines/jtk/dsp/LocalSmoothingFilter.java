@@ -233,15 +233,15 @@ public class LocalSmoothingFilter {
     apply(d,c,null,x,y);
   }
 
-	/**
-	 * Applies this filter for specified tensors and scale factor on the GPU.
-	 * @param d tensors
-	 * @param c constant scale factor
+  /**
+   * Applies this filter for specified tensors and scale factor on the GPU.
+   * @param d tensors
+   * @param c constant scale factor
 	 * @param x input array
 	 * @param y output array
-	 */
+   */
   public void applyGPU(Tensors2 d, float c, float[][] x, float[][] y) {
-	    applyGPU(d,c,null,x,y);
+    applyGPU(d,c,null,x,y);
   }
 
   /**
@@ -266,60 +266,60 @@ public class LocalSmoothingFilter {
   }
   
   public void applyGPU(
-			Tensors2 d, float c, float[][] s, float[][] x, float[][] y)
-		  {
-			  int n1 = x.length;
-			  int n2 = x[0].length;
-			  int size = n1*n2;
-			  int size_y = (n1+1)*(n2+1);
-			  float[] x1 = new float[size];
-			  float[] y1 = new float[size_y];
-			  float[] s1 = new float[size];
-			  float[] d11 = new float[size];
-			  float[] d12 = new float[size];
-			  float[] d22 = new float[size];
-			  float c1 = 0.25f*c;
-			  String[] kernelNames = {"clcopy","soSmoothingNew","clsaxpy","cldot","clsxpay"};
-			  CLUtil.clInit(sourceStr, kernelNames);
-			  int num_groups = (int) (size/CLUtil.maxWorkGroupSize/4);
-			  CLUtil.packArray(n1, n2, x, x1); 
-			  CLUtil.packArray(n1, n2, s, s1);
-			  scopy(x1,y1);
-			  CLUtil.unPackTensor(n1, n2, d, d11, d12, d22);
-			  cl_mem d_x = CLUtil.createGPUBuffer(size, "r");
-			  cl_mem d_d11 = CLUtil.createGPUBuffer(size, "r");
-			  cl_mem d_d12 = CLUtil.createGPUBuffer(size, "r");
-			  cl_mem d_d22 = CLUtil.createGPUBuffer(size, "r");
-			  cl_mem d_y = CLUtil.createGPUBuffer(size_y, "rw");
-			  cl_mem d_d = CLUtil.createGPUBuffer(size, "rw");
-			  cl_mem d_r = CLUtil.createGPUBuffer(size, "rw");
-			  cl_mem d_q = CLUtil.createGPUBuffer(size, "rw");
-			  cl_mem d_delta = CLUtil.createGPUBuffer(num_groups, "rw");
-			  CLUtil.copyToBuffer(d11, d_d11, size);
-			  CLUtil.copyToBuffer(d12, d_d12, size);
-			  CLUtil.copyToBuffer(d22, d_d22, size);
-			  CLUtil.copyToBuffer(x1, d_x, size);
-			  CLUtil.copyToBuffer(y1, d_y, size_y);
-			  CLUtil.setKernelArg(CLUtil.kernels[1], d_d11, 1);
-			  CLUtil.setKernelArg(CLUtil.kernels[1], d_d12, 2);
-			  CLUtil.setKernelArg(CLUtil.kernels[1], d_d22, 3);
-			  CLUtil.setKernelArg(CLUtil.kernels[1], c1, 5); 
-			  Operator2G a = new A2G(_ldk,d11,d12,d22,c,s1); //constructs the diffusion operator
-			  solveG(a,n1,n2,d_x,d_y,d_d,d_q,d_r,d_delta); //solves the system of equations via a CG solver
-			  CLUtil.readFromBuffer(d_y, y1, size_y);
-			  clReleaseMemObject(d_x);
-			  clReleaseMemObject(d_y);
-			  clReleaseMemObject(d_d);
-			  clReleaseMemObject(d_r);
-			  clReleaseMemObject(d_q);
-			  clReleaseMemObject(d_d11);
-			  clReleaseMemObject(d_d12);
-			  clReleaseMemObject(d_d22);
-			  clReleaseMemObject(d_delta);
-			  CLUtil.clRelease();
-			  CLUtil.unPackArray(n1, n2, y1, y);
-			  
-		  }
+    Tensors2 d, float c, float[][] s, float[][] x, float[][] y)
+  {
+    int n1 = x.length;
+    int n2 = x[0].length;
+    int size = n1*n2;
+    int size_y = (n1+1)*(n2+1);
+    float[] x1 = new float[size];
+    float[] y1 = new float[size_y];
+    float[] s1 = new float[size];
+    float[] d11 = new float[size];
+    float[] d12 = new float[size];
+    float[] d22 = new float[size];
+    float c1 = 0.25f*c;
+    String[] kernelNames = {"clcopy","soSmoothingNew","clsaxpy","cldot","clsxpay"};
+    CLUtil.clInit(sourceStr, kernelNames);
+    int num_groups = (int) (size/CLUtil.maxWorkGroupSize/4);
+    CLUtil.packArray(n1, n2, x, x1); 
+    CLUtil.packArray(n1, n2, s, s1);
+    scopy(x1,y1);
+    CLUtil.unPackTensor(n1, n2, d, d11, d12, d22);
+    cl_mem d_x = CLUtil.createGPUBuffer(size, "r");
+    cl_mem d_d11 = CLUtil.createGPUBuffer(size, "r");
+    cl_mem d_d12 = CLUtil.createGPUBuffer(size, "r");
+    cl_mem d_d22 = CLUtil.createGPUBuffer(size, "r");
+    cl_mem d_y = CLUtil.createGPUBuffer(size_y, "rw");
+    cl_mem d_d = CLUtil.createGPUBuffer(size, "rw");
+    cl_mem d_r = CLUtil.createGPUBuffer(size, "rw");
+    cl_mem d_q = CLUtil.createGPUBuffer(size, "rw");
+    cl_mem d_delta = CLUtil.createGPUBuffer(num_groups, "rw");
+    CLUtil.copyToBuffer(d11, d_d11, size);
+    CLUtil.copyToBuffer(d12, d_d12, size);
+    CLUtil.copyToBuffer(d22, d_d22, size);
+    CLUtil.copyToBuffer(x1, d_x, size);
+    CLUtil.copyToBuffer(y1, d_y, size_y);
+    CLUtil.setKernelArg(CLUtil.kernels[1], d_d11, 1);
+    CLUtil.setKernelArg(CLUtil.kernels[1], d_d12, 2);
+    CLUtil.setKernelArg(CLUtil.kernels[1], d_d22, 3);
+    CLUtil.setKernelArg(CLUtil.kernels[1], c1, 5); 
+    Operator2G a = new A2G(_ldk,d11,d12,d22,c,s1); //constructs the diffusion operator
+    solveG(a,n1,n2,d_x,d_y,d_d,d_q,d_r,d_delta); //solves the system of equations via a CG solver
+    CLUtil.readFromBuffer(d_y, y1, size_y);
+    clReleaseMemObject(d_x);
+    clReleaseMemObject(d_y);
+    clReleaseMemObject(d_d);
+    clReleaseMemObject(d_r);
+    clReleaseMemObject(d_q);
+    clReleaseMemObject(d_d11);
+    clReleaseMemObject(d_d12);
+    clReleaseMemObject(d_d22);
+    clReleaseMemObject(d_delta);
+    CLUtil.clRelease();
+    CLUtil.unPackArray(n1, n2, y1, y);
+
+  }
 
   /**
    * Applies this filter for identity tensors.
