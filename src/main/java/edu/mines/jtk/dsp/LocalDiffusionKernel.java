@@ -504,7 +504,8 @@ public class LocalDiffusionKernel {
     }
   }
   
-  private void apply22CL(int n1, int n2)
+  private void apply22CL(
+    int n1, int n2)
   {
     //TODO - do not hard code the local_group_size
     //long[] local_group_size = new long[]{32, 32}; 
