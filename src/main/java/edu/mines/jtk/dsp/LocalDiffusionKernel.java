@@ -221,16 +221,16 @@ public class LocalDiffusionKernel {
   }
   
   public void applyGPU(
-	int n1, int n2)
+    int n1, int n2)
   {
-	  for(int ipass=0; ipass<_npass; ++ipass) {
-			//TODO - Allow for multiple passes
-		  if(_stencil==Stencil.D22CL) {
-			  apply22CL(n1,n2);
-		  }
-		  
-	  }
- 
+    for(int ipass=0; ipass<_npass; ++ipass) {
+      //TODO - Allow for multiple passes
+      if(_stencil==Stencil.D22CL) {
+        apply22CL(n1,n2);
+      }
+
+    }
+
   }
   
   
