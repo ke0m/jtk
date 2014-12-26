@@ -512,11 +512,8 @@ public class LocalDiffusionKernel {
     long[] mapped_n1 = new long[]{n2/2};
     long[] mapped_n2 = new long[]{n1/2};
     long[] global_group_size_block = new long[]{(long)Math.ceil(mapped_n1[0]/local_group_size[0] + 1)*local_group_size[0], (long)Math.ceil(mapped_n2[0]/local_group_size[0] + 1) * local_group_size[1]};
-
-    for(int offsetx = 0; offsetx < 2; ++offsetx)
-    {
-      for(int offsety = 0; offsety < 2; ++offsety)
-      {
+    for(int offsetx = 0; offsetx < 2; ++offsetx) {
+      for(int offsety = 0; offsety < 2; ++offsety) {
         CLUtil.setKernelArg(CLUtil.kernels[1], offsetx, 8);
         CLUtil.setKernelArg(CLUtil.kernels[1], offsety, 9);
         CLUtil.executeKernel(CLUtil.kernels[1], 2, global_group_size_block, local_group_size);
