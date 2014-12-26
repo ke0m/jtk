@@ -169,11 +169,11 @@ public class LocalSmoothingFilter {
     apply(null,1.0f,null,x,y);
   }
  
- /**
-	* Applies this filter for identity tensors on the GPU
-	* @param x input array.
-	* @param y output array.
-	*/	
+  /**
+   * Applies this filter for identity tensors on the GPU
+   * @param x input array.
+   * @param y output array.
+   */	
   public void applyGPU(float[][] x, float[][] y) 
   {
     applyGPU(null,1.0f,null,x,y);
