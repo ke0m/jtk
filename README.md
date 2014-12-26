@@ -1,4 +1,4 @@
-## Structure-Oriented Smoothing of 2D Images on the GPU
+## Structure-oriented smoothing of 2D images on the GPU
 
 This repository contains the code for Joseph Jennings' Senior Design Project (GPGN 438) 
 under the guidance of Professor [Dave Hale](http://inside.mines.edu/~dhale) 
