@@ -460,7 +460,7 @@ public class LocalSmoothingFilter {
   private BandPassFilter _lpf; // lowpass filter, null until applied
   private double _kmax; // maximum wavenumber for lowpass filter
   
-	//String containing OpenCL kernels
+  //String containing OpenCL kernels
   String sourceStr =
 		  "__kernel void clcopy(int n1, int n2, __global const float* restrict d_x, __global float* restrict d_y)" +"\n" +
 		  "{" + "\n" +
