@@ -618,34 +618,34 @@ public class LocalSmoothingFilter {
   }
   
   private static class A2G implements Operator2G {
-	  A2G(LocalDiffusionKernel ldk, float[] d11, float[] d12, float[] d22, float c, float[] s) {
-		 _ldk = ldk;
-		 _d11 = d11;
-		 _d12 = d12;
-		 _d22 = d22;
-		 _c = c;
-		 _s = s;
-		  
-	  }
-	  
-	  public void applyGPU(int n1, int n2, cl_mem d_x, cl_mem d_y)
-	  {
-		  long[] global_work_group_size = {n1*n2};
-		  CLUtil.setKernelArg(CLUtil.kernels[0], n1, 0);
-		  CLUtil.setKernelArg(CLUtil.kernels[0], n2, 1);
-		  CLUtil.setKernelArg(CLUtil.kernels[0], d_x, 2);
-		  CLUtil.setKernelArg(CLUtil.kernels[0], d_y, 3);
-		  CLUtil.executeKernel(CLUtil.kernels[0], 1, global_work_group_size);
-		  _ldk.applyGPU(n1, n2);
+    A2G(LocalDiffusionKernel ldk, float[] d11, float[] d12, float[] d22, float c, float[] s) {
+      _ldk = ldk;
+      _d11 = d11;
+      _d12 = d12;
+      _d22 = d22;
+      _c = c;
+      _s = s;
 
-	  }
-	  
-	  private LocalDiffusionKernel _ldk;
-	  private float[] _d11;
-	  private float[] _d12;
-	  private float[] _d22;
-	  private float _c;
-	  private float[] _s;
+    }
+
+    public void applyGPU(int n1, int n2, cl_mem d_x, cl_mem d_y)
+    {
+      long[] global_work_group_size = {n1*n2};
+      CLUtil.setKernelArg(CLUtil.kernels[0], n1, 0);
+      CLUtil.setKernelArg(CLUtil.kernels[0], n2, 1);
+      CLUtil.setKernelArg(CLUtil.kernels[0], d_x, 2);
+      CLUtil.setKernelArg(CLUtil.kernels[0], d_y, 3);
+      CLUtil.executeKernel(CLUtil.kernels[0], 1, global_work_group_size);
+      _ldk.applyGPU(n1, n2);
+
+    }
+
+    private LocalDiffusionKernel _ldk;
+    private float[] _d11;
+    private float[] _d12;
+    private float[] _d22;
+    private float _c;
+    private float[] _s;
   }
 
   private static class A3 implements Operator3 {
@@ -866,101 +866,101 @@ public class LocalSmoothingFilter {
 	// Note that the convergence of this solver depends only on a set number of iterations 
 	// that is specified in the constructor of this class.
   private void solveG(Operator2G a, int n1, int n2, cl_mem d_x, cl_mem d_y, cl_mem d_d, cl_mem d_q, cl_mem d_r, cl_mem d_delta) {
-	  	int size = n1*n2;
-	    float[] r = new float[size];
-	    float[] q = new float[size];
-	    float[] d = new float[size];
-	    float[] p_delta = new float[(int)(size/CLUtil.maxWorkGroupSize/4)]; 
-	    long[] local_work_size_vec = {CLUtil.maxWorkGroupSize};
-	    long[] global_work_size_oned = {size};
-	    long[] global_work_size_vec = {((long)Math.ceil(size/local_work_size_vec[0]/4)+1)*local_work_size_vec[0]}; 
-	    CLUtil.setKernelArg(CLUtil.kernels[0], n1, 0);
-	    CLUtil.setKernelArg(CLUtil.kernels[0], n2, 1);
-	    CLUtil.setKernelArg(CLUtil.kernels[0], d_x, 2);
-	    CLUtil.setKernelArg(CLUtil.kernels[0], d_r, 3);
-	    CLUtil.executeKernel(CLUtil.kernels[0], 1, global_work_size_oned); //clcopy
-	    CLUtil.setKernelArg(CLUtil.kernels[1], d_y, 0);
-	    CLUtil.setKernelArg(CLUtil.kernels[1], d_q, 4);
-	    CLUtil.setKernelArg(CLUtil.kernels[1], n1, 6);
-	    CLUtil.setKernelArg(CLUtil.kernels[1], n2, 7);
-	    a.applyGPU(n1,n2,d_x,d_q); //soSmoothingNew
-	    CLUtil.setKernelArg(CLUtil.kernels[2], n1, 0);
-	    CLUtil.setKernelArg(CLUtil.kernels[2], n2, 1);
-	    CLUtil.setKernelArg(CLUtil.kernels[2], -1.0f, 2);
-	    CLUtil.setKernelArg(CLUtil.kernels[2], d_q, 3);
-	    CLUtil.setKernelArg(CLUtil.kernels[2], d_r, 4);
-	    CLUtil.executeKernel(CLUtil.kernels[2], 1, global_work_size_oned); //clsaxpy
-	    CLUtil.setKernelArg(CLUtil.kernels[0], n1, 0);
-	    CLUtil.setKernelArg(CLUtil.kernels[0], n2, 1);
-	    CLUtil.setKernelArg(CLUtil.kernels[0], d_r, 2);
-	    CLUtil.setKernelArg(CLUtil.kernels[0], d_d, 3);
-	    CLUtil.executeKernel(CLUtil.kernels[0], 1, global_work_size_oned); //clcopy
-	    CLUtil.setKernelArg(CLUtil.kernels[3], n1, 0);
-	    CLUtil.setKernelArg(CLUtil.kernels[3], n2, 1);
-	    CLUtil.setKernelArg(CLUtil.kernels[3], d_r, 2);
-	    CLUtil.setKernelArg(CLUtil.kernels[3], d_r, 3);
-	    CLUtil.setKernelArg(CLUtil.kernels[3], d_delta, 4);
-	    CLUtil.setLocalKernelArg(CLUtil.kernels[3], (int)(CLUtil.maxWorkGroupSize*4), 5);
-	    CLUtil.executeKernel(CLUtil.kernels[3], 1, global_work_size_vec, local_work_size_vec); //cldot
-	    CLUtil.readFromBuffer(d_delta, p_delta, (int)(size/CLUtil.maxWorkGroupSize/4));
-	    float delta = sum(p_delta);
-	    CLUtil.setKernelArg(CLUtil.kernels[3], n1, 0);
-	    CLUtil.setKernelArg(CLUtil.kernels[3], n2, 1);
-	    CLUtil.setKernelArg(CLUtil.kernels[3], d_x, 2);
-	    CLUtil.setKernelArg(CLUtil.kernels[3], d_x, 3);
-	    CLUtil.setKernelArg(CLUtil.kernels[3], d_delta, 4);
-	    CLUtil.setLocalKernelArg(CLUtil.kernels[3], (int)(CLUtil.maxWorkGroupSize*4), 5);
-	    CLUtil.executeKernel(CLUtil.kernels[3], 1, global_work_size_vec, local_work_size_vec); //cldot
-	    CLUtil.readFromBuffer(d_delta, p_delta, (int)(size/CLUtil.maxWorkGroupSize/4));
-	    float bnorm = sqrt(sum(p_delta));
-	    int iter;
-			for (iter=0; iter<_niter; ++iter) {
-				CLUtil.setKernelArg(CLUtil.kernels[1], d_d, 0);
-				CLUtil.setKernelArg(CLUtil.kernels[1], d_q, 4);
-				CLUtil.setKernelArg(CLUtil.kernels[1], n1, 6);
-				CLUtil.setKernelArg(CLUtil.kernels[1], n2, 7);
-				a.applyGPU(n1,n2,d_d,d_q); // q = Ad soSmoothingNew
-				CLUtil.setKernelArg(CLUtil.kernels[3], n1, 0);
-				CLUtil.setKernelArg(CLUtil.kernels[3], n2, 1);
-				CLUtil.setKernelArg(CLUtil.kernels[3], d_d, 2);
-				CLUtil.setKernelArg(CLUtil.kernels[3], d_q, 3);
-				CLUtil.setKernelArg(CLUtil.kernels[3], d_delta, 4);
-				CLUtil.setLocalKernelArg(CLUtil.kernels[3], (int)(CLUtil.maxWorkGroupSize*4), 5);
-				CLUtil.executeKernel(CLUtil.kernels[3], 1, global_work_size_vec, local_work_size_vec); //cldot
-				CLUtil.readFromBuffer(d_delta, p_delta, (int)(size/CLUtil.maxWorkGroupSize/4));
-				float dq = sum(p_delta);
-				float alpha = delta/dq; // alpha = r'r/d'Ad
-				CLUtil.setKernelArg(CLUtil.kernels[2], n1, 0);
-				CLUtil.setKernelArg(CLUtil.kernels[2], n2, 1);
-				CLUtil.setKernelArg(CLUtil.kernels[2], alpha, 2);
-				CLUtil.setKernelArg(CLUtil.kernels[2], d_d, 3);
-				CLUtil.setKernelArg(CLUtil.kernels[2], d_y, 4);
-				CLUtil.executeKernel(CLUtil.kernels[2], 1, global_work_size_oned); //clsaxpy
-				CLUtil.setKernelArg(CLUtil.kernels[2], n1, 0);
-				CLUtil.setKernelArg(CLUtil.kernels[2], n2, 1);
-				CLUtil.setKernelArg(CLUtil.kernels[2], -alpha, 2);
-				CLUtil.setKernelArg(CLUtil.kernels[2], d_q, 3);
-				CLUtil.setKernelArg(CLUtil.kernels[2], d_r, 4);
-				CLUtil.executeKernel(CLUtil.kernels[2], 1, global_work_size_oned); //clsaxpy
-				float deltaOld = delta;
-				CLUtil.setKernelArg(CLUtil.kernels[3], n1, 0);
-				CLUtil.setKernelArg(CLUtil.kernels[3], n2, 1);
-				CLUtil.setKernelArg(CLUtil.kernels[3], d_r, 2);
-				CLUtil.setKernelArg(CLUtil.kernels[3], d_r, 3);
-				CLUtil.setKernelArg(CLUtil.kernels[3], d_delta, 4);
-				CLUtil.setLocalKernelArg(CLUtil.kernels[3], (int)(CLUtil.maxWorkGroupSize*4), 5);
-				CLUtil.executeKernel(CLUtil.kernels[3], 1, global_work_size_vec, local_work_size_vec); //cldot
-				CLUtil.readFromBuffer(d_delta, p_delta, (int)(size/CLUtil.maxWorkGroupSize/4));
-				delta = sum(p_delta);
-				float beta = delta/deltaOld; 
-				CLUtil.setKernelArg(CLUtil.kernels[4], n1, 0);
-				CLUtil.setKernelArg(CLUtil.kernels[4], n2, 1);
-				CLUtil.setKernelArg(CLUtil.kernels[4], beta, 2);
-				CLUtil.setKernelArg(CLUtil.kernels[4], d_r, 3);
-				CLUtil.setKernelArg(CLUtil.kernels[4], d_d, 4);
-				CLUtil.executeKernel(CLUtil.kernels[4], 1, global_work_size_oned); //clsxpay
-			}
-	}
+    int size = n1*n2;
+    float[] r = new float[size];
+    float[] q = new float[size];
+    float[] d = new float[size];
+    float[] p_delta = new float[(int)(size/CLUtil.maxWorkGroupSize/4)]; 
+    long[] local_work_size_vec = {CLUtil.maxWorkGroupSize};
+    long[] global_work_size_oned = {size};
+    long[] global_work_size_vec = {((long)Math.ceil(size/local_work_size_vec[0]/4)+1)*local_work_size_vec[0]}; 
+    CLUtil.setKernelArg(CLUtil.kernels[0], n1, 0);
+    CLUtil.setKernelArg(CLUtil.kernels[0], n2, 1);
+    CLUtil.setKernelArg(CLUtil.kernels[0], d_x, 2);
+    CLUtil.setKernelArg(CLUtil.kernels[0], d_r, 3);
+    CLUtil.executeKernel(CLUtil.kernels[0], 1, global_work_size_oned); //clcopy
+    CLUtil.setKernelArg(CLUtil.kernels[1], d_y, 0);
+    CLUtil.setKernelArg(CLUtil.kernels[1], d_q, 4);
+    CLUtil.setKernelArg(CLUtil.kernels[1], n1, 6);
+    CLUtil.setKernelArg(CLUtil.kernels[1], n2, 7);
+    a.applyGPU(n1,n2,d_x,d_q); //soSmoothingNew
+    CLUtil.setKernelArg(CLUtil.kernels[2], n1, 0);
+    CLUtil.setKernelArg(CLUtil.kernels[2], n2, 1);
+    CLUtil.setKernelArg(CLUtil.kernels[2], -1.0f, 2);
+    CLUtil.setKernelArg(CLUtil.kernels[2], d_q, 3);
+    CLUtil.setKernelArg(CLUtil.kernels[2], d_r, 4);
+    CLUtil.executeKernel(CLUtil.kernels[2], 1, global_work_size_oned); //clsaxpy
+    CLUtil.setKernelArg(CLUtil.kernels[0], n1, 0);
+    CLUtil.setKernelArg(CLUtil.kernels[0], n2, 1);
+    CLUtil.setKernelArg(CLUtil.kernels[0], d_r, 2);
+    CLUtil.setKernelArg(CLUtil.kernels[0], d_d, 3);
+    CLUtil.executeKernel(CLUtil.kernels[0], 1, global_work_size_oned); //clcopy
+    CLUtil.setKernelArg(CLUtil.kernels[3], n1, 0);
+    CLUtil.setKernelArg(CLUtil.kernels[3], n2, 1);
+    CLUtil.setKernelArg(CLUtil.kernels[3], d_r, 2);
+    CLUtil.setKernelArg(CLUtil.kernels[3], d_r, 3);
+    CLUtil.setKernelArg(CLUtil.kernels[3], d_delta, 4);
+    CLUtil.setLocalKernelArg(CLUtil.kernels[3], (int)(CLUtil.maxWorkGroupSize*4), 5);
+    CLUtil.executeKernel(CLUtil.kernels[3], 1, global_work_size_vec, local_work_size_vec); //cldot
+    CLUtil.readFromBuffer(d_delta, p_delta, (int)(size/CLUtil.maxWorkGroupSize/4));
+    float delta = sum(p_delta);
+    CLUtil.setKernelArg(CLUtil.kernels[3], n1, 0);
+    CLUtil.setKernelArg(CLUtil.kernels[3], n2, 1);
+    CLUtil.setKernelArg(CLUtil.kernels[3], d_x, 2);
+    CLUtil.setKernelArg(CLUtil.kernels[3], d_x, 3);
+    CLUtil.setKernelArg(CLUtil.kernels[3], d_delta, 4);
+    CLUtil.setLocalKernelArg(CLUtil.kernels[3], (int)(CLUtil.maxWorkGroupSize*4), 5);
+    CLUtil.executeKernel(CLUtil.kernels[3], 1, global_work_size_vec, local_work_size_vec); //cldot
+    CLUtil.readFromBuffer(d_delta, p_delta, (int)(size/CLUtil.maxWorkGroupSize/4));
+    float bnorm = sqrt(sum(p_delta));
+    int iter;
+    for (iter=0; iter<_niter; ++iter) {
+      CLUtil.setKernelArg(CLUtil.kernels[1], d_d, 0);
+      CLUtil.setKernelArg(CLUtil.kernels[1], d_q, 4);
+      CLUtil.setKernelArg(CLUtil.kernels[1], n1, 6);
+      CLUtil.setKernelArg(CLUtil.kernels[1], n2, 7);
+      a.applyGPU(n1,n2,d_d,d_q); // q = Ad soSmoothingNew
+      CLUtil.setKernelArg(CLUtil.kernels[3], n1, 0);
+      CLUtil.setKernelArg(CLUtil.kernels[3], n2, 1);
+      CLUtil.setKernelArg(CLUtil.kernels[3], d_d, 2);
+      CLUtil.setKernelArg(CLUtil.kernels[3], d_q, 3);
+      CLUtil.setKernelArg(CLUtil.kernels[3], d_delta, 4);
+      CLUtil.setLocalKernelArg(CLUtil.kernels[3], (int)(CLUtil.maxWorkGroupSize*4), 5);
+      CLUtil.executeKernel(CLUtil.kernels[3], 1, global_work_size_vec, local_work_size_vec); //cldot
+      CLUtil.readFromBuffer(d_delta, p_delta, (int)(size/CLUtil.maxWorkGroupSize/4));
+      float dq = sum(p_delta);
+      float alpha = delta/dq; // alpha = r'r/d'Ad
+      CLUtil.setKernelArg(CLUtil.kernels[2], n1, 0);
+      CLUtil.setKernelArg(CLUtil.kernels[2], n2, 1);
+      CLUtil.setKernelArg(CLUtil.kernels[2], alpha, 2);
+      CLUtil.setKernelArg(CLUtil.kernels[2], d_d, 3);
+      CLUtil.setKernelArg(CLUtil.kernels[2], d_y, 4);
+      CLUtil.executeKernel(CLUtil.kernels[2], 1, global_work_size_oned); //clsaxpy
+      CLUtil.setKernelArg(CLUtil.kernels[2], n1, 0);
+      CLUtil.setKernelArg(CLUtil.kernels[2], n2, 1);
+      CLUtil.setKernelArg(CLUtil.kernels[2], -alpha, 2);
+      CLUtil.setKernelArg(CLUtil.kernels[2], d_q, 3);
+      CLUtil.setKernelArg(CLUtil.kernels[2], d_r, 4);
+      CLUtil.executeKernel(CLUtil.kernels[2], 1, global_work_size_oned); //clsaxpy
+      float deltaOld = delta;
+      CLUtil.setKernelArg(CLUtil.kernels[3], n1, 0);
+      CLUtil.setKernelArg(CLUtil.kernels[3], n2, 1);
+      CLUtil.setKernelArg(CLUtil.kernels[3], d_r, 2);
+      CLUtil.setKernelArg(CLUtil.kernels[3], d_r, 3);
+      CLUtil.setKernelArg(CLUtil.kernels[3], d_delta, 4);
+      CLUtil.setLocalKernelArg(CLUtil.kernels[3], (int)(CLUtil.maxWorkGroupSize*4), 5);
+      CLUtil.executeKernel(CLUtil.kernels[3], 1, global_work_size_vec, local_work_size_vec); //cldot
+      CLUtil.readFromBuffer(d_delta, p_delta, (int)(size/CLUtil.maxWorkGroupSize/4));
+      delta = sum(p_delta);
+      float beta = delta/deltaOld; 
+      CLUtil.setKernelArg(CLUtil.kernels[4], n1, 0);
+      CLUtil.setKernelArg(CLUtil.kernels[4], n2, 1);
+      CLUtil.setKernelArg(CLUtil.kernels[4], beta, 2);
+      CLUtil.setKernelArg(CLUtil.kernels[4], d_r, 3);
+      CLUtil.setKernelArg(CLUtil.kernels[4], d_d, 4);
+      CLUtil.executeKernel(CLUtil.kernels[4], 1, global_work_size_oned); //clsxpay
+    }
+  }
   
   private void solve(Operator3 a, float[][][] b, float[][][] x) {
     int n1 = b[0][0].length;
