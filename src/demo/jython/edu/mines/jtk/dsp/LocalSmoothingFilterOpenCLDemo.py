@@ -1,6 +1,7 @@
 import random
 import threading
 import time
+import sys, os
 
 
 from java.lang import System, Runnable
@@ -22,6 +23,16 @@ import jocl_smoother
 from java_smoother import *
 from jocl_smoother import *
 
+
+def getDataDir():
+  scriptDir = sys.path[0]
+  baseIndex = scriptDir.find("jtk"+os.sep+"src")
+  if baseIndex<0:
+    baseIndex = scriptDir.find("idh"+os.sep+"bench")
+  if baseIndex<0:
+    return None
+  dataDir = scriptDir[:baseIndex]+"jtk"+os.sep+"data"+os.sep
+  return dataDir
 
 
 class Demo(JFrame, Runnable):
@@ -57,8 +68,7 @@ class Demo(JFrame, Runnable):
         qButton.setBounds(200, 500, 80, 30)
         qButton.setToolTipText("Quit Button")
         self.panel.add(qButton)
-#TODO- Set this to an environment variable
-        newImage = ImageIO.read(io.File("/home/joe/dev/jtk/data/input.png"))
+        newImage = ImageIO.read(io.File(getDataDir() + "input.png"))
         resizedImage =  newImage.getScaledInstance(600, 600,10)
         newIcon = ImageIcon(resizedImage)
         label1 = JLabel("Input Image",newIcon, JLabel.CENTER)
@@ -89,7 +99,7 @@ class Demo(JFrame, Runnable):
         self.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE)
         self.setLocationRelativeTo(None)
         self.setVisible(True)
-
+        
     def onQuit(self, e): System.exit(0)
     
     def onJocl(self, e): 
@@ -111,6 +121,9 @@ class Demo(JFrame, Runnable):
      java_smoother(iters)
      elapsed = Calendar.getInstance().getTimeInMillis() - self.started;
      self.clockLabel.setText( 'Java Elapsed: %.2f seconds' % ( float( elapsed ) / 1000.0 ) )
+     
+
+     
      
     
 if ( __name__ == '__main__' ) or ( __name__ == 'main' ) :
