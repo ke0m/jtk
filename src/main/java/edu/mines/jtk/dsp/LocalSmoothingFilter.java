@@ -237,8 +237,8 @@ public class LocalSmoothingFilter {
    * Applies this filter for specified tensors and scale factor on the GPU.
    * @param d tensors
    * @param c constant scale factor
-	 * @param x input array
-	 * @param y output array
+   * @param x input array
+   * @param y output array
    */
   public void applyGPU(Tensors2 d, float c, float[][] x, float[][] y) {
     applyGPU(d,c,null,x,y);
@@ -265,6 +265,14 @@ public class LocalSmoothingFilter {
     }
   }
   
+  /**
+   * Applies this filter for specified tensors and scale factors on the GPU.
+   * @param d tensors.
+   * @param c constant scale factor for tensors.
+   * @param s array of scale factors for tensors.
+   * @param x input array.
+   * @param y output array.
+   */
   public void applyGPU(
     Tensors2 d, float c, float[][] s, float[][] x, float[][] y)
   {
