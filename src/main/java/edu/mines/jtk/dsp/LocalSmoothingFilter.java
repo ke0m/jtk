@@ -863,8 +863,8 @@ public class LocalSmoothingFilter {
  
   // Conjugate-gradient solution of Ax = b for the GPU, with no preconditioner.
   // Uses the initial values of x; does not assume they are zero.
-	// Note that the convergence of this solver depends only on a set number of iterations 
-	// that is specified in the constructor of this class.
+  // Note that the convergence of this solver depends only on a set number of iterations 
+  // that is specified in the constructor of this class.
   private void solveG(Operator2G a, int n1, int n2, cl_mem d_x, cl_mem d_y, cl_mem d_d, cl_mem d_q, cl_mem d_r, cl_mem d_delta) {
     int size = n1*n2;
     float[] r = new float[size];
