@@ -197,7 +197,7 @@ public class LocalSmoothingFilter {
    * @param y output array.
    */
   public void applyGPU(float c, float[][] x, float[][] y) {
-	    applyGPU(null,c,null,x,y);
+    applyGPU(null,c,null,x,y);
    }
 
   /**
