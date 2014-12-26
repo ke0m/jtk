@@ -20,10 +20,8 @@ be installed which can be found at this [site](https://developer.nvidia.com/cuda
 Once CUDA is installed, I recommend testing to see if your system can run OpenCL programs by 
 downloading and installing the GPU Computing SDK code samples from [here](https://developer.nvidia.com/cuda-toolkit-32-downloads).
 
-Once the OpenCL drivers have been installed for your system, and you have your install location of the Mines JTK as the environment variable ```MINES_JTK_HOME ```
-, you can run the `LocalSmoothingFilterOpenCLDemo.py` demo jython script that demonstrates the use of OpenCL for the LocalSmoothingFilter found at
-`src/demo/jython/edu/mines/jtk/dsp`
-
+Once the OpenCL drivers have been installed for your system, you can run the `LocalSmoothingFilterOpenCLDemo.py` jython script that demonstrates the use of 
+OpenCL for the LocalSmoothingFilter found at `src/demo/jython/edu/mines/jtk/dsp`. 
 
 Below is the `readme.txt` file written by Professor Hale containing instructions
 on how to install the Mines JTK.
