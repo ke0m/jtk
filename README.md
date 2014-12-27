@@ -1,26 +1,25 @@
 ## Structure-oriented smoothing of 2D images on the GPU
 
 This repository contains the code for Joseph Jennings' Senior Design Project (GPGN 438) 
-under the guidance of Professor [Dave Hale](http://inside.mines.edu/~dhale) 
-at the [Colorado School of Mines](http://mines.edu).
+under the guidance of Professor<a href="http://inside.mines.edu/~dhale" target="_blank"> Dave Hale</a>
+at the <a href="http://mines.edu" target="_blank">Colorado School of Mines</a>.
 
-This software builds upon the  [Mines Java Toolkit (JTK)](https://github.com/dhale/jtk/) which 
-will first need to be downloaded and built in order to run the structure-oriented smoothing software 
-contained within this repository. Specifically, the final product of this software
+This software builds upon the  <a href="https://github.com/dhale/jtk" target="_blank">Mines Java Toolkit (JTK) </a>which 
+is contained within this repository. Specifically, the final product of this software
 is a small extension within the `src/main/java/edu/mines/jtk/dsp/LocalSmoothingFilter.java` class of the Mines JTK that was first published in Professor 
-Hale's paper [Structure-oriented smoothing and semblance](http://inside.mines.edu/~dhale/papers/Hale09StructureOrientedSmoothingAndSemblance.pdf).
-My extension utilizes the [JOCL](http://www.jocl.org/) libraries (Java bindings for OpenCL) to multi-thread the 
+Hale's paper <a href="http://inside.mines.edu/~dhale/papers/Hale09StructureOrientedSmoothingAndSemblance.pdf" target="_blank">Structure-oriented smoothing and semblance</a>.
+My extension utilizes the <a href="http://www.jocl.org" target="_blank">JOCL</a> libraries (Java bindings for OpenCL) to multi-thread the 
 LocalDiffusionKernel and conjugate gradient solver on a GPU (Graphics Processing Unit). 
 
-To build the Mines JTK, you can clone this repository and follow the instructions within the `readme.txt` shown below.
+If you do not have the Mines JTK installed, you can install it by cloning this repository and following the instructions within the `readme.txt` shown below.
 
 In addition to the Mines JTK, drivers for your GPU must be downloaded and installed to execute the OpenCL programs.
-For systems using AMD graphics cards, the OpenCL drivers can be downloaded from 
-[here](http://developer.amd.com/tools-and-sdks/opencl-zone/).
+For systems using AMD graphics cards, the OpenCL drivers can be downloaded 
+<a href="http://developer.amd.com/tools-and-sdks/opencl-zone/" target=_"blank">here</a>.
 For systems with NVIDIA graphics cards, first, the CUDA drivers will need to 
-be installed which can be found at this [site](https://developer.nvidia.com/cuda-downloads?sid=607361).
+be installed which can be found at this <a href="https://developer.nvidia.com/cuda-downloads?sid=607361" target="_blank">site</a>.
 Once CUDA is installed, I recommend testing to see if your system can run OpenCL programs by 
-downloading and installing the GPU Computing SDK code samples from [here](https://developer.nvidia.com/cuda-toolkit-32-downloads).
+downloading and installing the GPU Computing SDK code samples <a href="https://developer.nvidia.com/cuda-toolkit-32-downloads" target="_blank">here</a>.
 
 Once the OpenCL drivers have been installed for your system, you can run the `LocalSmoothingFilterOpenCLDemo.py` jython script that demonstrates the use of 
 OpenCL for the LocalSmoothingFilter found at `src/demo/jython/edu/mines/jtk/dsp`. 
