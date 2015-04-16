@@ -24,6 +24,8 @@ downloading and installing the GPU Computing SDK code samples <a href="https://d
 Once the OpenCL drivers have been installed for your system, you can run the `LocalSmoothingFilterOpenCLDemo.py` jython script that demonstrates the use of 
 OpenCL for the LocalSmoothingFilter found at `src/demo/jython/edu/mines/jtk/dsp`. 
 
+If you have any trouble installing this software, running the demo or have any questions for me, please contact me at joseph.s.jennings@gmail.com
+
 Below is the `readme.txt` file written by Professor Hale containing instructions
 on how to install the Mines JTK.
 <pre>
