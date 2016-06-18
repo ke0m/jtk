@@ -8,6 +8,8 @@ package edu.mines.jtk.dsp;
 
 import static edu.mines.jtk.util.ArrayMath.*;
 
+import java.util.Random;
+
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
@@ -22,6 +24,31 @@ public class LinearInterpolatorTest extends TestCase {
     junit.textui.TestRunner.run(suite);
   }
 
+  public void testDp(){
+    int nt = 1000;
+    int nts = 250;
+    float dt  = 0.00045f;
+    float dts = 0.0018f;
+    float fts = 0.f;
+    float ft  = 0.f;
+    float[] mod  = sub(randfloat(nts),0.5f);
+    float[] dat  = sub(randfloat(nt),0.5f);
+    float[] mods = zerofloat(nts);
+    float[] dats = zerofloat(nt);
+    LinearInterpolator lim = new LinearInterpolator();
+    lim.setUniform(nts, dts, fts, mod);
+    lim.interpSimp(nt, dt, ft, dats);
+    LinearInterpolator lid = new LinearInterpolator();
+    lid.setUniform(nts, dts, fts, dat);
+    lid.adjInterpSimp(nt, dt, ft, mods);
+    float dotm = dot(mod,mods);
+    float dotd = dot(dat,dats);
+    assertEquals(dotm,dotd,0.00001f);
+  }
+  private static float dot(float[] x, float[] y) {
+    return sum(mul(x,y));
+  }
+  
   public void testInterpolator1() {
     int nxu = 100;
     float dxu = 0.3f;
