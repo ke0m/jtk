@@ -59,6 +59,7 @@ public class LinearInterpolator {
     _xf = fxu;
     _xs = 1.0/dxu;
     _xb = 2.0-_xf*_xs;
+    _xbs  = -_xf*_xs;
     _nxum = nxu-1;
   }
 
@@ -124,6 +125,42 @@ public class LinearInterpolator {
     }
     return yr;
   }
+  
+  /**
+   * Interpolates the current uniform samples as real numbers
+   * without any extrapolation
+   * @param x the value at which to interpolate y(x)
+   * @return the interpolated y(x)
+   */
+  public float interpSimp(double x) {
+    float yr = 0.f;
+    double xn = _xbs+x*_xs;
+    int ixn = (int)xn;
+    float a1 = (float)(xn - ixn);
+    float a0 = 1.0f - a1;
+    if(0<=ixn && ixn<_nxum)
+      yr = a0*_yu[ixn]+a1*_yu[ixn+1];
+    return yr;
+  }
+  
+  /**
+   * The adjoint of interpSimp
+   * @param x the value at which to interpolate y(x)
+   * @param ix the index at which to access the input data
+   * @return an array containing the computed index for
+   *         the output model as well as the amplitudes
+   */
+  public float[] adjInterpSimp(double x, int ix) {
+    float[] yr = new float[3];
+    double xn = _xbs+x*_xs;
+    int ixn = (int)xn;
+    float a1 = (float)(xn - ixn);
+    float a0 = 1.0f - a1;
+    yr[0] = (float)ixn;
+    yr[1] = a0*_yu[ix];
+    yr[2] = a1*_yu[ix];
+    return yr;
+  }
 
   /**
    * Interpolates the current uniform samples as real numbers.
@@ -150,6 +187,41 @@ public class LinearInterpolator {
   public void interpolate(int nx, double dx, double fx, float[] y) {
     for (int ix=0; ix<nx; ++ix)
       y[ix] = interpolate(fx+ix*dx);
+  }
+  
+  /**
+   * Interpolates the current uniform samples as real numbers
+   * <p>
+   * This method does not do any extrapolation
+   * @param nx the number of output samples.
+   * @param dx the output sampling interval.
+   * @param fx the value x corresponding to the first output sample y[0].
+   * @param y array[nx] of interpolated output y(x).
+   */
+  public void interpSimp(int nx, double dx, double fx, float[] y) {
+    for(int ix=0; ix<nx; ++ix){
+      y[ix] = interpSimp(fx+ix*dx);
+     }
+  }
+  
+  /**
+   * The adjoint of interpSimp
+   * @param nx the number of output samples.
+   * @param dx the output sampling interval.
+   * @param fx the value x corresponding to the first output sample y[0].
+   * @param y array[nx] of adjoint interpolated output y(x)
+   */
+  public void adjInterpSimp(int nx, double dx, double fx, float[] y) {
+    float[] out = new float[3];
+    int ixn = 0;
+    for(int ix=0; ix<nx; ++ix){
+      out = adjInterpSimp(fx+ix*dx,ix);
+      ixn = (int)out[0];
+      if(0<=ixn && ixn<_nxum){
+        y[ixn  ] += out[1];
+        y[ixn+1] += out[2];
+      }
+    }
   }
 
   /**
@@ -496,6 +568,7 @@ public class LinearInterpolator {
   private double _xf;
   private double _xs;
   private double _xb;
+  private double _xbs;
   private int _nxum;
 
   // Current uniform samples.
